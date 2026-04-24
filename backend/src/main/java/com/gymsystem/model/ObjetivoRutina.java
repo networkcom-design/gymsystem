@@ -1,0 +1,2 @@
+package com.gymsystem.model;
+public enum ObjetivoRutina { HIPERTROFIA, FUERZA, RESISTENCIA, DEFINICION, ACONDICIONAMIENTO, REHABILITACION }
