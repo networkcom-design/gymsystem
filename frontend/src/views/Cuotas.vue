@@ -44,7 +44,10 @@ const cuotasFiltradas = computed(() => {
   if (estadoFilter.value) list = list.filter(c => c.estado === estadoFilter.value)
   if (alumnoFilter.value) {
     const q = alumnoFilter.value.toLowerCase()
-    list = list.filter(c => c.alumnoNombre?.toLowerCase().includes(q))
+    list = list.filter(c => {
+      const nombre = `${c.alumno?.apellido || ''} ${c.alumno?.nombre || ''}`.toLowerCase()
+      return nombre.includes(q)
+    })
   }
   return list
 })
@@ -179,7 +182,7 @@ function estadoLabel(e) {
       </thead>
       <tbody>
         <tr v-for="c in cuotasFiltradas" :key="c.id">
-          <td><strong>{{ c.alumnoNombre }}</strong></td>
+          <td><strong>{{ c.alumno?.apellido }}, {{ c.alumno?.nombre }}</strong></td>
           <td>
             <div class="chip-group">
               <span v-for="d in c.disciplinas" :key="d.id" class="chip">{{ d.nombre }}</span>
@@ -218,7 +221,7 @@ function estadoLabel(e) {
       <div class="modal">
         <h3>Registrar pago</h3>
         <p style="color:var(--muted);margin-bottom:16px">
-          {{ cuotaSeleccionada?.alumnoNombre }} — {{ nombreMes(cuotaSeleccionada?.mes) }} {{ cuotaSeleccionada?.anio }}
+          {{ cuotaSeleccionada?.alumno?.apellido }}, {{ cuotaSeleccionada?.alumno?.nombre }} — {{ nombreMes(cuotaSeleccionada?.mes) }} {{ cuotaSeleccionada?.anio }}
           — {{ formatARS(cuotaSeleccionada?.monto) }}
         </p>
         <div class="field">
