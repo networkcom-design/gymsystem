@@ -1,5 +1,6 @@
 package com.gymsystem.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
@@ -14,6 +15,7 @@ public class Disciplina {
     @Column(nullable = false, unique = true)
     private String nombre;
 
+    @JsonAlias("precio")
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal precioMensual;
 
