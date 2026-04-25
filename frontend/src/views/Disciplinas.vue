@@ -6,7 +6,7 @@ import { formatARS } from '../utils/format'
 const disciplinas = ref([])
 const loading = ref(true)
 
-const formVacio = () => ({ id: null, nombre: '', descripcion: '', precio: '', activa: true })
+const formVacio = () => ({ id: null, nombre: '', descripcion: '', precioMensual: '', activa: true })
 const form = ref(formVacio())
 const showModal = ref(false)
 const saving = ref(false)
@@ -28,7 +28,7 @@ function abrirNueva() {
   showModal.value = true
 }
 function abrirEditar(d) {
-  form.value = { ...d }
+  form.value = { ...d, precioMensual: d.precioMensual }
   errorMsg.value = ''
   showModal.value = true
 }
@@ -36,14 +36,14 @@ function cerrar() { showModal.value = false }
 
 async function guardar() {
   if (!form.value.nombre.trim()) { errorMsg.value = 'El nombre es requerido'; return }
-  if (!form.value.precio || isNaN(Number(form.value.precio))) { errorMsg.value = 'El precio debe ser un número válido'; return }
+  if (!form.value.precioMensual || isNaN(Number(form.value.precioMensual))) { errorMsg.value = 'El precio debe ser un número válido'; return }
   saving.value = true
   errorMsg.value = ''
   try {
     const payload = {
       nombre: form.value.nombre,
       descripcion: form.value.descripcion,
-      precio: Number(form.value.precio),
+      precioMensual: Number(form.value.precioMensual),
       activa: form.value.activa
     }
     if (form.value.id) {
@@ -93,7 +93,7 @@ async function toggleActiva(d) {
         <tr v-for="d in disciplinas" :key="d.id">
           <td><strong>{{ d.nombre }}</strong></td>
           <td style="color:var(--muted)">{{ d.descripcion || '—' }}</td>
-          <td>{{ formatARS(d.precio) }}</td>
+          <td>{{ formatARS(d.precioMensual) }}</td>
           <td>{{ d.alumnosCount ?? '—' }}</td>
           <td>
             <span class="badge" :class="d.activa ? 'pagada' : 'vencida'">
@@ -129,7 +129,7 @@ async function toggleActiva(d) {
         </div>
         <div class="field">
           <label>Precio mensual (ARS) *</label>
-          <input v-model="form.precio" type="number" min="0" placeholder="18000" />
+          <input v-model="form.precioMensual" type="number" min="0" placeholder="18000" />
         </div>
         <div class="field" style="display:flex;align-items:center;gap:10px">
           <input type="checkbox" v-model="form.activa" id="chk-activa" style="width:auto" />
