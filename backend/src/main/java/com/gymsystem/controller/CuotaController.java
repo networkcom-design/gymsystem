@@ -162,7 +162,7 @@ public class CuotaController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/generar-mes")
+    @PostMapping({"/generar-mes", "/generar"})
     public ResponseEntity<?> generarMes(@RequestBody GenerarCuotasRequest req) {
         if (req.getMes() == null || req.getAnio() == null)
             return ResponseEntity.badRequest().body(Map.of("error", "mes y anio son requeridos"));
