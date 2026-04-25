@@ -56,7 +56,7 @@ async function generarMes() {
   if (!confirm(`¿Generar cuotas para ${nombreMes(mesActual)} ${anioActual}?`)) return
   generando.value = true
   try {
-    await http.post('/cuotas/generar', { mes: mesActual, anio: anioActual })
+    await http.post('/cuotas/generar-mes', { mes: mesActual, anio: anioActual })
     await cargarCuotas()
   } catch (e) {
     alert(e.response?.data?.message || 'Error al generar cuotas')
