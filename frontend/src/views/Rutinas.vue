@@ -138,8 +138,8 @@ async function guardar() {
       nivel:       form.value.nivel,
       objetivo:    form.value.objetivo,
       dia:         form.value.dia || null,
-      disciplinaId:form.value.disciplinaId || null,
-      alumnoId:    form.value.alumnoId || null,
+      disciplina:  form.value.disciplinaId ? { id: form.value.disciplinaId } : null,
+      alumno:      form.value.alumnoId     ? { id: form.value.alumnoId }     : null,
       activa:      form.value.activa,
       ejercicios:  form.value.ejercicios.filter(e => e.nombre.trim()).map((e, i) => ({ ...e, orden: i }))
     }

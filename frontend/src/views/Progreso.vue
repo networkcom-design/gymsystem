@@ -109,7 +109,7 @@ async function guardar() {
     if (editando.value) {
       await http.put(`/progreso/${editando.value}`, payload)
     } else {
-      await http.post('/progreso', payload)
+      await http.post(`/progreso/alumno/${alumnoSeleccionado.value}`, payload)
     }
     const { data } = await http.get(`/progreso/alumno/${alumnoSeleccionado.value}`)
     registros.value = data

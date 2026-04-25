@@ -11,7 +11,7 @@ const filtroActivo = ref('')
 
 const alumnoVacio = () => ({
   id: null, nombre: '', apellido: '', email: '', telefono: '',
-  fechaNacimiento: '', fechaInicio: '', activo: true, disciplinaIds: []
+  fechaNacimiento: '', fechaAlta: '', activo: true, disciplinaIds: []
 })
 const form = ref(alumnoVacio())
 const showModal = ref(false)
@@ -56,7 +56,7 @@ function abrirEditar(a) {
   form.value = {
     ...a,
     fechaNacimiento: a.fechaNacimiento ? a.fechaNacimiento.slice(0, 10) : '',
-    fechaInicio: a.fechaInicio ? a.fechaInicio.slice(0, 10) : '',
+    fechaAlta: a.fechaAlta ? a.fechaAlta.slice(0, 10) : '',
     disciplinaIds: a.disciplinas?.map(d => d.id) || []
   }
   errorMsg.value = ''
@@ -78,7 +78,7 @@ async function guardar() {
       email: form.value.email,
       telefono: form.value.telefono,
       fechaNacimiento: form.value.fechaNacimiento || null,
-      fechaInicio: form.value.fechaInicio || null,
+      fechaAlta: form.value.fechaAlta || null,
       activo: form.value.activo,
       disciplinaIds: form.value.disciplinaIds
     }
@@ -98,7 +98,7 @@ async function guardar() {
 
 async function toggleActivo(a) {
   try {
-    await http.patch(`/alumnos/${a.id}/activo`, { activo: !a.activo })
+    await http.put(`/alumnos/${a.id}`, { activo: !a.activo })
     a.activo = !a.activo
   } catch { /* noop */ }
 }
@@ -152,7 +152,7 @@ function toggleDisciplina(id) {
               <span v-if="!a.disciplinas?.length" style="color:var(--muted);font-size:12px">Sin disciplina</span>
             </div>
           </td>
-          <td>{{ formatFecha(a.fechaInicio) }}</td>
+          <td>{{ formatFecha(a.fechaAlta) }}</td>
           <td>
             <span class="badge" :class="a.activo ? 'pagada' : 'vencida'">
               {{ a.activo ? 'Activo' : 'Inactivo' }}
@@ -204,7 +204,7 @@ function toggleDisciplina(id) {
           </div>
           <div class="field">
             <label>Fecha de inicio</label>
-            <input v-model="form.fechaInicio" type="date" />
+            <input v-model="form.fechaAlta" type="date" />
           </div>
         </div>
 
