@@ -6,8 +6,10 @@ const route = useRoute()
 const router = useRouter()
 const isPublic = computed(() => route.meta.public)
 const user = computed(() => {
-  const raw = localStorage.getItem('gymsystem_user')
-  return raw ? JSON.parse(raw) : null
+  try {
+    const raw = localStorage.getItem('gymsystem_user')
+    return raw && raw !== 'undefined' ? JSON.parse(raw) : null
+  } catch { return null }
 })
 const mobileMenuOpen = ref(false)
 watch(() => route.fullPath, () => { mobileMenuOpen.value = false })

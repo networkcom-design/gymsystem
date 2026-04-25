@@ -15,7 +15,7 @@ async function login() {
   try {
     const { data } = await http.post('/auth/login', { username: username.value, password: password.value })
     localStorage.setItem('gymsystem_token', data.token)
-    localStorage.setItem('gymsystem_user', JSON.stringify(data.user))
+    localStorage.setItem('gymsystem_user', JSON.stringify({ username: data.username, nombre: data.nombre }))
     router.push({ name: 'dashboard' })
   } catch (e) {
     error.value = e.response?.data?.message || 'Usuario o contraseña incorrectos'

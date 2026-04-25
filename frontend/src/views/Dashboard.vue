@@ -31,15 +31,15 @@ onMounted(async () => {
         </div>
         <div class="card stat">
           <div class="label">Cuotas al día</div>
-          <div class="value success">{{ stats.cuotasPagadas }}</div>
+          <div class="value success">{{ stats.cuotasPagadasMes }}</div>
         </div>
         <div class="card stat">
           <div class="label">Cuotas pendientes</div>
-          <div class="value warning">{{ stats.cuotasPendientes }}</div>
+          <div class="value warning">{{ stats.cuotasPendientesMes }}</div>
         </div>
         <div class="card stat">
           <div class="label">Cuotas vencidas</div>
-          <div class="value" style="color:var(--danger)">{{ stats.cuotasVencidas }}</div>
+          <div class="value" style="color:var(--danger)">{{ stats.cuotasVencidasTotal }}</div>
         </div>
       </div>
 
@@ -47,7 +47,7 @@ onMounted(async () => {
       <div class="grid grid-3" style="margin-bottom:24px">
         <div class="card stat">
           <div class="label">Recaudado este mes</div>
-          <div class="value success">{{ formatARS(stats.recaudadoMes) }}</div>
+          <div class="value success">{{ formatARS(stats.ingresosDelMes) }}</div>
         </div>
         <div class="card stat">
           <div class="label">Rutinas plantillas</div>
@@ -59,52 +59,23 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Tabla de disciplinas -->
-      <div class="card" style="margin-bottom:24px">
-        <h3 style="margin-bottom:16px;font-size:15px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Disciplinas activas</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Disciplina</th>
-              <th>Alumnos</th>
-              <th>Cuota mensual</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="d in stats.disciplinas" :key="d.id">
-              <td>{{ d.nombre }}</td>
-              <td>{{ d.alumnosCount }}</td>
-              <td>{{ formatARS(d.precio) }}</td>
-            </tr>
-            <tr v-if="!stats.disciplinas?.length">
-              <td colspan="3" style="text-align:center;color:var(--muted)">Sin disciplinas</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Cuotas vencidas recientes -->
+      <!-- Resumen rápido -->
       <div class="card">
-        <h3 style="margin-bottom:16px;font-size:15px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Cuotas vencidas recientes</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Alumno</th>
-              <th>Período</th>
-              <th>Monto</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="c in stats.cuotasVencidasRecientes" :key="c.id">
-              <td>{{ c.alumnoNombre }}</td>
-              <td>{{ nombreMes(c.mes) }} {{ c.anio }}</td>
-              <td>{{ formatARS(c.monto) }}</td>
-            </tr>
-            <tr v-if="!stats.cuotasVencidasRecientes?.length">
-              <td colspan="3" style="text-align:center;color:var(--muted)">Sin cuotas vencidas</td>
-            </tr>
-          </tbody>
-        </table>
+        <h3 style="margin-bottom:16px;font-size:15px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Resumen</h3>
+        <div class="grid grid-3">
+          <div class="stat">
+            <div class="label">Total alumnos</div>
+            <div class="value">{{ stats.alumnosTotales }}</div>
+          </div>
+          <div class="stat">
+            <div class="label">Disciplinas activas</div>
+            <div class="value primary">{{ stats.disciplinas }}</div>
+          </div>
+          <div class="stat">
+            <div class="label">Período</div>
+            <div class="value" style="font-size:18px;color:var(--muted)">{{ nombreMes(stats.mes) }} {{ stats.anio }}</div>
+          </div>
+        </div>
       </div>
 
     </template>
