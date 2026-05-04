@@ -17,7 +17,7 @@ const tab            = ref('PLANTILLA')   // 'PLANTILLA' | 'PERSONALIZADA'
 const rutinas        = ref([])
 const alumnos        = ref([])
 const disciplinas    = ref([])
-const loading        = ref(true)
+const loading        = ref(true) 
 
 // Filtros plantillas
 const filtroNivel     = ref('')
@@ -33,6 +33,35 @@ const showModal  = ref(false)
 const saving     = ref(false)
 const errorMsg   = ref('')
 
+// ─── QR Modal ─────────────────────────────────────────────────────────────────
+const showQrModal = ref(false)
+const qrRutina    = ref(null)
+const qrImgUrl    = ref(null)
+const qrLoading   = ref(false)
+
+async function abrirQr(r) {
+  qrRutina.value  = r
+  qrImgUrl.value  = null
+  qrLoading.value = true
+  showQrModal.value = true
+  try {
+    const response = await http.get(`/rutinas/${r.id}/qr`, { responseType: 'blob' })
+    qrImgUrl.value = URL.createObjectURL(response.data)
+  } catch {
+    alert('Error al generar el QR')
+    showQrModal.value = false
+  } finally {
+    qrLoading.value = false
+  }
+}
+
+function cerrarQr() {
+  if (qrImgUrl.value) URL.revokeObjectURL(qrImgUrl.value)
+  qrImgUrl.value    = null
+  showQrModal.value = false
+  qrRutina.value    = null
+}
+  
 const ejercicioVacio = () => ({
   nombre: '', series: 3, repeticiones: '10', descanso: '60s',
   peso: '', grupoMuscular: '', notas: '', orden: 0
@@ -283,9 +312,10 @@ function objetivoColor(o) {
             </div>
             <div v-if="r.ejercicios.length > 4" class="ej-mas">+{{ r.ejercicios.length - 4 }} más</div>
           </div>
-          <div class="rutina-actions">
+          <div class="">
             <button class="small secondary" @click="abrirEditar(r)">Editar</button>
             <button class="small secondary" @click="duplicar(r)">Duplicar</button>
+            <button class="small qr" @click="abrirQr(r)">📱 QR</button>
             <button class="small success" @click="abrirAsignar(r)">Asignar a cliente</button>
             <button class="small danger" @click="eliminar(r)">Borrar</button>
           </div>
@@ -355,6 +385,7 @@ function objetivoColor(o) {
             <div class="rutina-actions">
               <button class="small secondary" @click="abrirEditar(r)">Editar</button>
               <button class="small secondary" @click="duplicar(r)">Duplicar</button>
+              <button class="small qr" @click="abrirQr(r)">📱 QR</button>
               <button class="small danger" @click="eliminar(r)">Borrar</button>
             </div>
           </div>
@@ -473,10 +504,48 @@ function objetivoColor(o) {
         </div>
       </div>
     </div>
+    <!-- ═══ MODAL QR ═══ -->
+    <div v-if="showQrModal" class="modal-overlay" @click.self="cerrarQr">
+      <div class="modal" style="width:340px;text-align:center">
+        <h3 style="margin-bottom:4px">📱 Código QR</h3>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:16px">
+          {{ qrRutina?.nombre }}
+        </p>
+    
+        <div v-if="qrLoading" style="padding:40px 0;color:var(--muted)">
+          Generando QR...
+        </div>
+        <template v-else>
+          <img :src="qrImgUrl" alt="QR Rutina" style="width:240px;height:240px;border-radius:8px;border:3px solid var(--border)" />
+          <p style="font-size:12px;color:var(--muted);margin-top:12px">
+            Escaneá con la cámara del celular para abrir el PDF de la rutina
+          </p>
+          
+            :href="`/api/rutinas/${qrRutina?.id}/pdf`"
+            target="_blank"
+            style="display:inline-block;margin-top:8px;padding:8px 16px;background:var(--primary);color:#fff;border-radius:6px;font-size:13px;text-decoration:none"
+          >
+            📄 Abrir PDF
+          </a>
+        </template>
+    
+        <div class="actions" style="margin-top:16px;justify-content:center">
+          <button class="secondary" @click="cerrarQr">Cerrar</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
+button.small.qr {
+  background: #7c3aed;
+  color: white;
+  border: none;
+}
+button.small.qr:hover {
+  background: #6d28d9;
+}
 .rutinas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
