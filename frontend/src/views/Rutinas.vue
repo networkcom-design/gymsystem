@@ -38,6 +38,7 @@ const showQrModal = ref(false)
 const qrRutina    = ref(null)
 const qrImgUrl    = ref(null)
 const qrLoading   = ref(false)
+const BACKEND_URL = 'https://gymsystem-backend.onrender.com'
 
 async function abrirQr(r) {
   qrRutina.value  = r
@@ -521,7 +522,7 @@ function objetivoColor(o) {
             Escaneá con la cámara del celular para abrir el PDF de la rutina
           </p>
           
-          <a  :href="`/api/rutinas/${qrRutina?.id}/pdf`"
+          <a :href="`${BACKEND_URL}/api/rutinas/${qrRutina?.id}/pdf`"
             target="_blank"
             style="display:inline-block;margin-top:8px;padding:8px 16px;background:var(--primary);color:#fff;border-radius:6px;font-size:13px;text-decoration:none"
           >
