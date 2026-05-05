@@ -4,6 +4,12 @@ import com.gymsystem.model.*;
 import com.gymsystem.repository.AlumnoRepository;
 import com.gymsystem.repository.DisciplinaRepository;
 import com.gymsystem.repository.RutinaRepository;
+import com.gymsystem.service.QrService;
+import com.gymsystem.service.RutinaPdfService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +23,10 @@ public class RutinaController {
     private final RutinaRepository rutinaRepo;
     private final AlumnoRepository alumnoRepo;
     private final DisciplinaRepository disciplinaRepo;
+    @Autowired
+    private RutinaPdfService pdfService;
+    @Autowired
+    private QrService qrService;
 
     public RutinaController(RutinaRepository rutinaRepo, AlumnoRepository alumnoRepo, DisciplinaRepository disciplinaRepo) {
         this.rutinaRepo = rutinaRepo;
@@ -126,4 +136,26 @@ public class RutinaController {
         Alumno a = r.getAlumno();
         r.setAlumno(a != null && a.getId() != null ? alumnoRepo.findById(a.getId()).orElse(null) : null);
     }
+
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> getPdf(@PathVariable Long id) throws Exception {
+        Rutina r = rutinaRepo.findById(id).orElseThrow();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"rutina-" + id + ".pdf\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfService.generarPdf(r));
+    }
+
+    @GetMapping("/{id}/qr")
+    public ResponseEntity<byte[]> getQr(
+            @PathVariable Long id,
+            HttpServletRequest request) throws Exception {
+        String url = request.getScheme() + "://" + request.getServerName()
+                + ":" + request.getServerPort()
+                + "/api/rutinas/" + id + "/pdf";
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(qrService.generarQr(url));
+    }
+
 }
