@@ -384,10 +384,15 @@ function objetivoColor(o) {
               </div>
             </div>
             <div class="rutina-actions">
-              <button class="small secondary" @click="abrirEditar(r)">Editar</button>
-              <button class="small secondary" @click="duplicar(r)">Duplicar</button>
-              <button class="small qr" @click="abrirQr(r)">📱 QR</button>
-              <button class="small danger" @click="eliminar(r)">Borrar</button>
+              <div class="actions-row">
+                <button class="small secondary" @click="abrirEditar(r)">Editar</button>
+                <button class="small secondary" @click="duplicar(r)">Duplicar</button>
+                <button class="small danger" @click="eliminar(r)">Borrar</button>
+              </div>
+              <div class="actions-row">
+                <button class="small qr" @click="abrirQr(r)">📱 Ver QR</button>
+                <button class="small success" @click="abrirAsignar(r)">Asignar a cliente</button>
+              </div>
             </div>
           </div>
         </div>
@@ -625,13 +630,21 @@ button.small.qr:hover {
 .ej-nombre { font-weight: 600; flex: 1; }
 .ej-detalle { color: var(--muted); white-space: nowrap; }
 .ej-mas { font-size: 11px; color: var(--muted); text-align: center; padding-top: 2px; }
+
 .rutina-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 8px;
   margin-top: auto;
-  padding-top: 4px;
+  padding-top: 8px;
   border-top: 1px solid var(--border);
+}
+.actions-row {
+  display: flex;
+  gap: 8px;
+}
+.actions-row .small {
+  flex: 1;
 }
 
 /* Selector de alumno */
