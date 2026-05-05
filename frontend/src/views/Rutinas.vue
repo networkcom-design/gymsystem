@@ -628,7 +628,7 @@ button.small.qr:hover {
 .rutina-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
   margin-top: auto;
   padding-top: 4px;
   border-top: 1px solid var(--border);
