@@ -521,7 +521,7 @@ function objetivoColor(o) {
             Escaneá con la cámara del celular para abrir el PDF de la rutina
           </p>
           
-            :href="`/api/rutinas/${qrRutina?.id}/pdf`"
+          <a  :href="`/api/rutinas/${qrRutina?.id}/pdf`"
             target="_blank"
             style="display:inline-block;margin-top:8px;padding:8px 16px;background:var(--primary);color:#fff;border-radius:6px;font-size:13px;text-decoration:none"
           >
