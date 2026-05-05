@@ -8,6 +8,8 @@ import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+@Service
 public class QrService {
     public byte[] generarQr(String url) throws WriterException, IOException {
         QRCodeWriter writer = new QRCodeWriter();
