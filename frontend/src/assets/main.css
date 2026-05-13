@@ -20,18 +20,105 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-.app-layout { display: flex; min-height: 100vh; }
-.sidebar { width: 230px; background: var(--panel); border-right: 1px solid var(--border); padding: 24px 0; display: flex; flex-direction: column; }
+.app-layout { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ── Topbar siempre visible en desktop y mobile ── */
+.mobile-topbar {
+  display: flex;
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  align-items: center;
+  gap: 14px;
+}
+.mobile-brand { display: flex; flex-direction: column; line-height: 1.1; }
+.mobile-brand strong { color: var(--primary); letter-spacing: 1.5px; font-size: 15px; }
+.mobile-brand span { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
+
+.hamburger {
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.hamburger:hover { background: var(--panel-2); }
+.hamburger span { display: block; height: 2px; width: 100%; background: var(--text); border-radius: 2px; }
+
+/* ── Layout interior (sidebar + main) ── */
+.app-body {
+  display: flex;
+  flex: 1;
+}
+
+/* Usamos el layout directo del app-layout */
+.app-layout { display: flex; flex-direction: column; min-height: 100vh; }
+.app-layout > .sidebar,
+.app-layout > .main {
+  /* posicionados como hijos directos del flex column,
+     pero necesitamos que estén en fila — se maneja con un wrapper implícito */
+}
+
+/* Re-declaramos el layout como grilla para que sidebar y main sean lado a lado */
+.app-layout {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "topbar topbar"
+    "sidebar main";
+}
+
+.mobile-topbar { grid-area: topbar; }
+
+.sidebar {
+  grid-area: sidebar;
+  width: 230px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.25s ease, opacity 0.25s ease, padding 0.25s ease;
+  overflow: hidden;
+}
+
+.sidebar.collapsed {
+  width: 0;
+  padding: 0;
+  border-right: none;
+  opacity: 0;
+}
+
 .sidebar .brand { padding: 0 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
 .sidebar .brand h1 { font-size: 20px; color: var(--primary); letter-spacing: 1px; }
 .sidebar .brand .sub { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
-.nav a { display: block; padding: 12px 20px; color: var(--text); border-left: 3px solid transparent; transition: all 0.15s; }
+.nav a { display: block; padding: 12px 20px; color: var(--text); border-left: 3px solid transparent; transition: all 0.15s; white-space: nowrap; }
 .nav a:hover { background: var(--panel-2); text-decoration: none; }
 .nav a.active { background: var(--panel-2); border-left-color: var(--primary); color: var(--primary); }
-.sidebar-footer { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+.sidebar-footer { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); white-space: nowrap; }
 .sidebar-footer button { margin-top: 8px; width: 100%; }
 
-.main { flex: 1; padding: 32px; overflow-y: auto; }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 90; }
+
+.main {
+  grid-area: main;
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+  min-width: 0;
+}
 .main h2 { margin-bottom: 24px; font-size: 24px; }
 
 .card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
@@ -71,9 +158,9 @@ label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px
 .field { margin-bottom: 14px; }
 
 .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-.badge.pagada  { background: rgba(46,204,113,0.2);  color: var(--success); }
-.badge.pendiente { background: rgba(243,156,18,0.2); color: var(--warning); }
-.badge.vencida   { background: rgba(231,76,60,0.2);  color: var(--danger); }
+.badge.pagada    { background: rgba(46,204,113,0.2);  color: var(--success); }
+.badge.pendiente { background: rgba(243,156,18,0.2);  color: var(--warning); }
+.badge.vencida   { background: rgba(231,76,60,0.2);   color: var(--danger); }
 
 .toolbar { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
 .toolbar .spacer { flex: 1; }
@@ -83,13 +170,11 @@ label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px
 .modal h3 { margin-bottom: 20px; font-size: 18px; }
 .modal .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
-/* Tabs */
 .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 20px; gap: 0; }
 .tab-btn { background: transparent; border: none; color: var(--muted); padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.15s; border-radius: 0; }
 .tab-btn:hover { color: var(--text); background: transparent; }
 .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-/* Progreso trends */
 .trend-up   { color: var(--success); }
 .trend-down { color: var(--danger); }
 .trend-flat { color: var(--muted); }
@@ -109,22 +194,36 @@ label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px
 
 .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
 
-.mobile-topbar { display: none; position: sticky; top: 0; left: 0; right: 0; z-index: 50; background: var(--panel); border-bottom: 1px solid var(--border); padding: 12px 16px; align-items: center; gap: 14px; }
-.mobile-brand { display: flex; flex-direction: column; line-height: 1.1; }
-.mobile-brand strong { color: var(--primary); letter-spacing: 1.5px; font-size: 15px; }
-.mobile-brand span { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
-.hamburger { background: transparent; border: 1px solid var(--border); padding: 8px; width: 40px; height: 40px; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-around; cursor: pointer; }
-.hamburger:hover { background: var(--panel-2); }
-.hamburger span { display: block; height: 2px; width: 100%; background: var(--text); border-radius: 2px; }
-.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 90; }
-
 @media (max-width: 768px) {
   body { font-size: 13px; }
-  .app-layout { flex-direction: column; }
-  .mobile-topbar { display: flex; }
-  .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; transform: translateX(-100%); transition: transform 0.25s ease; z-index: 100; padding-top: 16px; }
+
+  .app-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "topbar"
+      "main";
+  }
+
+  .mobile-brand { display: flex; }
+
+  .sidebar {
+    grid-area: unset;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px !important;
+    opacity: 1 !important;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 100;
+    padding: 16px 0;
+    border-right: 1px solid var(--border) !important;
+  }
   .sidebar.open { transform: translateX(0); }
+  .sidebar.collapsed { transform: translateX(-100%); width: 260px !important; opacity: 1 !important; }
   .sidebar-overlay { display: block; }
+
   .main { padding: 16px; }
   .main h2 { font-size: 20px; margin-bottom: 16px; }
   .grid-4, .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 12px; }

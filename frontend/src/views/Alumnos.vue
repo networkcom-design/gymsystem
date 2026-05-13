@@ -10,7 +10,7 @@ const search = ref('')
 const filtroActivo = ref('')
 
 const alumnoVacio = () => ({
-  id: null, nombre: '', apellido: '', email: '', telefono: '',
+  id: null, nombre: '', apellido: '', dni: '', email: '', telefono: '',
   fechaNacimiento: '', fechaAlta: '', activo: true, disciplinaIds: []
 })
 const form = ref(alumnoVacio())
@@ -39,7 +39,8 @@ const alumnosFiltrados = computed(() => {
     list = list.filter(a =>
       (a.nombre + ' ' + a.apellido).toLowerCase().includes(q) ||
       a.email?.toLowerCase().includes(q) ||
-      a.telefono?.includes(q)
+      a.telefono?.includes(q) ||
+      a.dni?.includes(q)
     )
   }
   if (filtroActivo.value === 'activo') list = list.filter(a => a.activo)
@@ -55,6 +56,7 @@ function abrirNuevo() {
 function abrirEditar(a) {
   form.value = {
     ...a,
+    dni: a.dni || '',
     fechaNacimiento: a.fechaNacimiento ? a.fechaNacimiento.slice(0, 10) : '',
     fechaAlta: a.fechaAlta ? a.fechaAlta.slice(0, 10) : '',
     disciplinaIds: a.disciplinas?.map(d => d.id) || []
@@ -75,6 +77,7 @@ async function guardar() {
     const payload = {
       nombre: form.value.nombre,
       apellido: form.value.apellido,
+      dni: form.value.dni || null,
       email: form.value.email,
       telefono: form.value.telefono,
       fechaNacimiento: form.value.fechaNacimiento || null,
@@ -115,7 +118,7 @@ function toggleDisciplina(id) {
     <h2>Alumnos</h2>
 
     <div class="toolbar">
-      <input v-model="search" placeholder="Buscar por nombre, email, teléfono…" style="max-width:280px" />
+      <input v-model="search" placeholder="Buscar por nombre, email, teléfono, DNI…" style="max-width:280px" />
       <select v-model="filtroActivo" style="max-width:160px">
         <option value="">Todos</option>
         <option value="activo">Activos</option>
@@ -130,6 +133,7 @@ function toggleDisciplina(id) {
       <thead>
         <tr>
           <th>Nombre</th>
+          <th>DNI</th>
           <th>Contacto</th>
           <th>Disciplinas</th>
           <th>Inicio</th>
@@ -141,6 +145,9 @@ function toggleDisciplina(id) {
         <tr v-for="a in alumnosFiltrados" :key="a.id">
           <td>
             <strong>{{ a.apellido }}, {{ a.nombre }}</strong>
+          </td>
+          <td>
+            <span style="font-family:monospace;font-size:13px">{{ a.dni || '—' }}</span>
           </td>
           <td>
             <div>{{ a.email || '—' }}</div>
@@ -168,7 +175,7 @@ function toggleDisciplina(id) {
           </td>
         </tr>
         <tr v-if="alumnosFiltrados.length === 0">
-          <td colspan="6" class="empty">Sin resultados</td>
+          <td colspan="7" class="empty">Sin resultados</td>
         </tr>
       </tbody>
     </table>
@@ -177,6 +184,7 @@ function toggleDisciplina(id) {
     <div v-if="showModal" class="modal-overlay" @click.self="cerrar">
       <div class="modal">
         <h3>{{ form.id ? 'Editar alumno' : 'Nuevo alumno' }}</h3>
+
         <div class="grid grid-2">
           <div class="field">
             <label>Nombre *</label>
@@ -187,6 +195,12 @@ function toggleDisciplina(id) {
             <input v-model="form.apellido" placeholder="García" />
           </div>
         </div>
+
+        <div class="field">
+          <label>DNI</label>
+          <input v-model="form.dni" placeholder="12345678" style="max-width:200px" />
+        </div>
+
         <div class="grid grid-2">
           <div class="field">
             <label>Email</label>
@@ -197,6 +211,7 @@ function toggleDisciplina(id) {
             <input v-model="form.telefono" placeholder="+54 362 ..." />
           </div>
         </div>
+
         <div class="grid grid-2">
           <div class="field">
             <label>Fecha de nacimiento</label>

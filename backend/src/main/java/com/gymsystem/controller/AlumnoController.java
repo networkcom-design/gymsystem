@@ -4,6 +4,7 @@ import com.gymsystem.dto.AlumnoRequest;
 import com.gymsystem.model.Alumno;
 import com.gymsystem.model.Cuota;
 import com.gymsystem.model.Disciplina;
+import com.gymsystem.model.EstadoCuota;
 import com.gymsystem.repository.AlumnoRepository;
 import com.gymsystem.repository.CuotaRepository;
 import com.gymsystem.repository.DisciplinaRepository;
@@ -11,9 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/alumnos")
@@ -22,6 +21,7 @@ public class AlumnoController {
     private final AlumnoRepository alumnoRepo;
     private final DisciplinaRepository disciplinaRepo;
     private final CuotaRepository cuotaRepo;
+
 
     public AlumnoController(AlumnoRepository alumnoRepo, DisciplinaRepository disciplinaRepo, CuotaRepository cuotaRepo) {
         this.alumnoRepo = alumnoRepo;
@@ -78,5 +78,60 @@ public class AlumnoController {
             Set<Disciplina> set = new HashSet<>(disciplinaRepo.findAllById(req.getDisciplinaIds()));
             a.setDisciplinas(set);
         }
+    }
+    @GetMapping("/por-dni/{dni}")
+    public ResponseEntity<?> buscarPorDni(@PathVariable String dni) {
+        return alumnoRepo.findByDni(dni)
+                .map(alumno -> {
+                    List<Cuota> cuotas = cuotaRepo.findByAlumnoIdOrderByAnioDescMesDesc(alumno.getId());
+
+                    Optional<Cuota> ultimaPagada = cuotas.stream()
+                            .filter(c -> c.getEstado() == EstadoCuota.PAGADA)
+                            .max(Comparator.comparingInt((Cuota c) -> c.getAnio() * 100 + c.getMes()));
+
+                    boolean tieneVencidasSinPagar = cuotas.stream()
+                            .anyMatch(c -> c.getEstado() == EstadoCuota.VENCIDA);
+
+                    LocalDate hoy = LocalDate.now();
+                    String estadoCuota;
+                    String fechaVencimiento = null;
+
+                    if (ultimaPagada.isEmpty()) {
+                        estadoCuota = tieneVencidasSinPagar ? "VENCIDA" : "SIN_CUOTA";
+                    } else {
+                        Cuota ultima = ultimaPagada.get();
+                        fechaVencimiento = ultima.getFechaVencimiento() != null
+                                ? ultima.getFechaVencimiento().toString() : null;
+
+                        int mesActual = hoy.getYear() * 100 + hoy.getMonthValue();
+                        int mesUltima = ultima.getAnio() * 100 + ultima.getMes();
+
+                        boolean tieneVencidasPosteriores = cuotas.stream()
+                                .filter(c -> c.getEstado() == EstadoCuota.VENCIDA)
+                                .anyMatch(c -> (c.getAnio() * 100 + c.getMes()) > mesUltima);
+
+                        if (tieneVencidasPosteriores) {
+                            estadoCuota = "VENCIDA";
+                        } else if (mesUltima >= mesActual) {
+                            estadoCuota = "AL_DIA";
+                        } else if (mesUltima == mesActual - 1) {
+                            estadoCuota = "POR_VENCER";
+                        } else {
+                            estadoCuota = "VENCIDA";
+                        }
+                    }
+
+                    Map<String, Object> resp = new HashMap<>();
+                    resp.put("id", alumno.getId());
+                    resp.put("nombre", alumno.getNombre());
+                    resp.put("apellido", alumno.getApellido());
+                    resp.put("dni", alumno.getDni());
+                    resp.put("activo", alumno.isActivo());
+                    resp.put("estadoCuota", estadoCuota);
+                    resp.put("fechaVencimientoCuota", fechaVencimiento);
+
+                    return ResponseEntity.ok(resp);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }

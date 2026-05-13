@@ -61,7 +61,8 @@ public class SecurityConfig {
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/api/rutinas/*/pdf").permitAll()
-                .requestMatchers("/api/rutinas/*/qr").permitAll()    
+                .requestMatchers("/api/rutinas/*/qr").permitAll()
+                .requestMatchers("/api/alumnos/por-dni/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

@@ -15,7 +15,8 @@ const routes = [
   { path: '/disciplinas', name: 'disciplinas', component: Disciplinas },
   { path: '/cuotas', name: 'cuotas', component: Cuotas },
   { path: '/rutinas', name: 'rutinas', component: Rutinas },
-  { path: '/progreso', name: 'progreso', component: Progreso }
+  { path: '/progreso', name: 'progreso', component: Progreso },
+  { path: '/acceso', name: 'AccesoCliente', component: () => import('../views/AccesoCliente.vue'), meta: { requiresAuth: false }}
 ]
 
 const router = createRouter({ history: createWebHistory(), routes })
